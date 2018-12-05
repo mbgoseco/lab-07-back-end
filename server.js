@@ -6,7 +6,6 @@ const superagent = require('superagent');
 require('dotenv').config();
 const PORT = process.env.PORT || 3000;
 const app = express();
-
 app.use(cors());
 app.listen(PORT, () => {
   console.log(`listening on ${PORT}`);
