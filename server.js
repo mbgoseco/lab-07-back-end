@@ -28,6 +28,9 @@ app.get('/weather', getWeather);
 // Requests restaurant data
 app.get('/yelp', getRestaurants);
 
+// Requests movie data
+app.get('/movies', getMovies);
+
 // Location constructor
 function Location(query, res) {
   this.formatted_query = res.body.results[0].formatted_address;
@@ -49,6 +52,17 @@ function Restaurant(business) {
   this.price = business.price;
   this.rating = business.rating;
   this.url = business.url;
+}
+
+// Movie data constructor
+function Movie(data) {
+  this.title = data.title;
+  this.overview = data.overview;
+  this.average_votes = data.vote_average;
+  this.total_votes = data.vote_count;
+  this.image_url = `https://image.tmdb.org/t/p/w200_and_h300_bestv2/${data.poster_path}`;
+  this.popularity = data.popularity;
+  this.released_on = data.release_date;
 }
 
 // Helper function for location
@@ -81,5 +95,17 @@ function getRestaurants(req, res) {
       return new Restaurant(business);
     });
     res.send(yelpInfo);
+  }).catch(error => handleError(error));
+}
+
+// Helper function for movies
+function getMovies(req, res) {
+  const url = `https://api.themoviedb.org/3/search/movie?api_key=${process.env.MOVIEDB_API_KEY}&query=${req.query.data.search_query}`;
+
+  superagent.get(url).then(result => {
+    const movieData = result.body.results.map(data => {
+      return new Movie(data);
+    });
+    res.send(movieData);
   }).catch(error => handleError(error));
 }
